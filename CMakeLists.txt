@@ -1,0 +1,35 @@
+# Set minimum supported CMake version to 3.12
+cmake_minimum_required(VERSION 3.12)
+
+# Define project
+project(TrackingAntenna
+  LANGUAGES CXX C
+  VERSION 0.0.0)
+
+## Find libraries
+# Find HindsightCAN library
+find_package(HindsightCAN REQUIRED)
+# Find gpsd/libgps
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(libgps REQUIRED libgps)
+# Find JSON library
+find_package(nlohmann_json 3.2.0 REQUIRED)
+# Find Websocket++ (requires Boost System)
+find_package(websocketpp REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system)
+# Find system threading library
+find_package(Threads REQUIRED)
+
+# Add an executable for the main program.
+add_executable(antenna
+  # List all .cpp files here
+  src/main.cpp)
+
+# Link executable to libraries
+target_link_libraries(antenna
+  HindsightCAN::HindsightCAN
+  ${libgps_LIBRARIES}
+  websocketpp::websocketpp
+  nlohmann_json::nlohmann_json
+  ${Boost_LIBRARIES}
+  Threads::Threads)
