@@ -22,11 +22,9 @@ find_package(websocketpp REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 # Find system threading library
 find_package(Threads REQUIRED)
-
-# Add an executable for the main program.
-add_executable(antenna
-  # List all .cpp files here
-  src/main.cpp)
+# Find Catch2 unit testing framework
+find_package(Catch2 REQUIRED)
+enable_testing()
 
 # Libraries that should be linked to all executables
 set(LIBS
@@ -48,3 +46,11 @@ add_executable(antenna
 # Link executable to libraries
 target_link_libraries(antenna ${LIBS})
 
+# Add unit tests executable
+add_executable(tests
+  test/tests.cpp)
+target_link_libraries(tests ${LIBS})
+include(CTest)
+include(Catch)
+target_link_libraries(tests Catch2::Catch2)
+catch_discover_tests(tests)
