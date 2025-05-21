@@ -3,7 +3,8 @@
 from serial import Serial
 import socket
 
-UART_PATH = "/dev/serial0"
+SERIAL_PATH = "/dev/serial0"
+BAUD_RATE = 9600
 
 HOST = "0.0.0.0"
 PORT = 2000  # we are using port 2000 to communicate
@@ -37,7 +38,7 @@ def process_message(msg: bytes, ser: Serial) -> bytes:
         print(f"Unrecognized message: {msg}")
     return None
 
-ser = Serial(UART_PATH)
+ser = Serial(SERIAL_PATH, BAUD_RATE)
 
 try:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
