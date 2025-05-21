@@ -31,8 +31,8 @@ def send_message(conn: socket.socket, msg: bytes, mut: Lock) -> None:
         conn.close()
         raise
 
-# HOST = "raspberrypi.local"  # connect to raspberry pi over LAN connection
-HOST = "localhost"  # uncomment to connect to local server
+HOST = "raspberrypi.local"  # connect to raspberry pi over LAN connection
+# HOST = "localhost"  # uncomment to connect to local server
 PORT = 2000
 
 sock_mutex = Lock()

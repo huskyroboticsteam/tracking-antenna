@@ -62,9 +62,12 @@ try:
         except KeyboardInterrupt as e:
             print("Shutting down server")
             sock.close()
+            # turn off motors
+            ser.write((0).to_bytes(1))
             ser.close()
 except Exception as e:
     print(e)
 
-# turn off motors
-ser.write(b'\00')
+if ser.is_open():
+    # turn off motors
+    ser.write((0).to_bytes(1))
