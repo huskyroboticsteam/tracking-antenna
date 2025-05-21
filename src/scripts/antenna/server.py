@@ -3,6 +3,8 @@
 import serial
 import socket
 
+UART_PATH = "/dev/serial0"
+
 HOST = "0.0.0.0"
 PORT = 2000  # we are using port 2000 to communicate
 MAX_MSG_SIZE = 1024  # max 1024 bytes
@@ -19,24 +21,24 @@ def send_to_uart(msg: bytes) -> None:
 @param message the message we received
 @return what we should send back in response to this message
 """
-def process_message(msg: bytes) -> bytes:
+def process_message(msg: bytes, ser: serial.Serial) -> bytes:
     if msg == b'OFF':
-        send_to_uart((0).to_bytes(1, signed=False))
+        send_to_uart((0).to_bytes(1, signed=False), ser)
     elif msg == b'LEFT':
-        send_to_uart((1).to_bytes(1, signed=False))
+        send_to_uart((1).to_bytes(1, signed=False), ser)
     elif msg == b'RIGHT':
-        send_to_uart((2).to_bytes(1, signed=False))
+        send_to_uart((2).to_bytes(1, signed=False), ser)
     elif msg == b'UP':
-        send_to_uart((3).to_bytes(1, signed=False))
+        send_to_uart((3).to_bytes(1, signed=False), ser)
     elif msg == b'DOWN':
-        send_to_uart((4).to_bytes(1, signed=False))
+        send_to_uart((4).to_bytes(1, signed=False), ser)
     else:
         print(f"Unrecognized message: {msg}")
     return None
 
-
 try:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        ser = serial.Serial(UART_PATH)
         sock.bind((HOST, PORT))
         sock.listen()
         try:
@@ -52,7 +54,7 @@ try:
                             if not data:
                                 print("Client disconnected")
                                 break
-                            response = process_message(data)
+                            response = process_message(data, ser)
                             if data:
                                 conn.sendall(data)
         except KeyboardInterrupt as e:
