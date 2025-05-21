@@ -1,4 +1,4 @@
-#!/home/geeoon/Documents/husky_robotics/tracking-antenna/src/scripts/.venv/bin/python
+#!/home/geeoon/Documents/husky_robotics/tracking-antenna/src/scripts/.venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
