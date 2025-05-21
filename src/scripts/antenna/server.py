@@ -1,6 +1,6 @@
 # script that accepts motor commands and forwards them to the motors via UART
 
-import serial
+from serial import Serial
 import socket
 
 UART_PATH = "/dev/serial0"
@@ -13,7 +13,7 @@ MAX_MSG_SIZE = 1024  # max 1024 bytes
 @brief sends a message over UART
 @param message the message to send
 """
-def send_to_uart(msg: bytes, ser) -> None:
+def send_to_uart(msg: bytes, ser: Serial) -> None:
     print(f"Sending {msg} over UART")
     ser.write(msg)
 
@@ -22,7 +22,7 @@ def send_to_uart(msg: bytes, ser) -> None:
 @param message the message we received
 @return what we should send back in response to this message
 """
-def process_message(msg: bytes, ser) -> bytes:
+def process_message(msg: bytes, ser: Serial) -> bytes:
     if msg == b'OFF':
         send_to_uart((0).to_bytes(1, signed=False), ser)
     elif msg == b'LEFT':
@@ -37,7 +37,7 @@ def process_message(msg: bytes, ser) -> bytes:
         print(f"Unrecognized message: {msg}")
     return None
 
-ser = serial.Serial(UART_PATH)
+ser = Serial(UART_PATH)
 
 try:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:

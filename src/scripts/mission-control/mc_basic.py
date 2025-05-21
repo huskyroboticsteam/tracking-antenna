@@ -1,17 +1,27 @@
-import tkinter as tk
-import socket
+import tkinter as tk  # for gui
+import socket  # for connection
 import os  # for signal strength
-from threading import Lock
+from threading import Lock  # to prevent sending multiple messages
 
 DEVICE = "wlp0s20f3"  # wireless device, get by using iwconfig
 SIGNAL_PERIOD = 500  # how often to get the signal strength, in milliseconds
 
+"""
+@brief gets the signal strength in dBm
+@return a string with the signal strength rounded to 3 decimal points
+"""
 def get_signal_strength() -> str:
     output = os.popen(f'iw {DEVICE} station dump | grep -E "signal:\s*" | tr -d -c "\- 0-9"').read().lstrip()[:3]
     strength = float(output)
     normalized = (10.0 ** (strength / 10.0)) * 10.0 ** 7.0
     return f"Signal strength: {round(normalized, 3)}"
 
+"""
+@brief sends a message to the raspberry pi
+@param conn the connection to the raspberry pi
+@param msg the message to send
+@param mut the mutex to lock the raspberry pi conenction
+"""
 def send_message(conn: socket.socket, msg: bytes, mut: Lock) -> None:
     try:
         with mut:
@@ -21,7 +31,7 @@ def send_message(conn: socket.socket, msg: bytes, mut: Lock) -> None:
         conn.close()
         raise
 
-HOST = "raspberrypi.local"  # connect to raspberry pi
+HOST = "raspberrypi.local"  # connect to raspberry pi over LAN connection
 # HOST = "localhost"  # uncomment to connect to local server
 PORT = 2000
 
