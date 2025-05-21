@@ -1,6 +1,16 @@
 import tkinter as tk
 import socket
+import os  # for signal strength
 from threading import Lock
+
+DEVICE = "wlp0s20f3"  # wireless device, get by using iwconfig
+SIGNAL_PERIOD = 500  # how often to get the signal strength, in milliseconds
+
+def get_signal_strength() -> str:
+    output = os.popen(f'iw {DEVICE} station dump | grep -E "signal:\s*" | tr -d -c "\- 0-9"').read().lstrip()[:3]
+    strength = float(output)
+    normalized = (10.0 ** (strength / 10.0)) * 10.0 ** 7.0
+    return f"Signal strength: {round(normalized, 3)}"
 
 def send_message(conn: socket.socket, msg: bytes, mut: Lock) -> None:
     try:
@@ -9,7 +19,7 @@ def send_message(conn: socket.socket, msg: bytes, mut: Lock) -> None:
     except BrokenPipeError as e:
         print("Unexpectedly disconnected from server.")
         conn.close()
-        raise e
+        raise
 
 HOST = "raspberrypi.local"  # connect to raspberry pi
 # HOST = "localhost"  # uncomment to connect to local server
@@ -50,6 +60,11 @@ def on_down_press(event):
     print("Sending down turn")
     send_message(sock, b'DOWN', sock_mutex)
 
+def update_signal_strength(root: tk.Tk, label: tk.Label):
+    label.configure(text=get_signal_strength())
+    root.after(1000, update_signal_strength, root, signal_text)
+
+signal_strength = get_signal_strength()
 
 root = tk.Tk()
 root.geometry("450x500")
@@ -72,6 +87,11 @@ down_button = tk.Button(root, text="Down", width=10, height=5)
 down_button.bind("<Button-1>", on_down_press)
 down_button.bind("<ButtonRelease-1>", on_button_release)
 down_button.place(x=170, y=300)
+
+signal_text = tk.Label(root, text=signal_strength)
+
+root.after(SIGNAL_PERIOD, update_signal_strength, root, signal_text)
+signal_text.place(x=160, y=50)
 
 try:
     root.mainloop()
