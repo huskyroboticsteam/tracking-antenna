@@ -14,18 +14,23 @@ MAX_MSG_SIZE = 1024  # max 1024 bytes
 """
 def process_message(message: bytes) -> bytes:
     print(message)
+    # replace with actual processing
     return message
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     sock.bind((HOST, PORT))
     sock.listen()
-    conn, addr = sock.accept()
-    with conn:  # connection created
+    try:
         while True:
-            data = conn.recv(MAX_MSG_SIZE)
-            if not data:
-                print("Client disconnected")
-                break
-            response = process_message(data)
-            if data:
-                conn.sendall(data)  # replace with actually processing
+            conn, addr = sock.accept()
+            with conn:  # connection created
+                while True:
+                    data = conn.recv(MAX_MSG_SIZE)
+                    if not data:
+                        print("Client disconnected")
+                        break
+                    response = process_message(data)
+                    if data:
+                        conn.sendall(data)
+    except KeyboardInterrupt as e:
+        print("Shutting down server...")
