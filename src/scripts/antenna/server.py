@@ -68,6 +68,6 @@ try:
 except Exception as e:
     print(e)
 
-if ser.is_open():
+if ser.is_open:
     # turn off motors
     ser.write((0).to_bytes(1))
