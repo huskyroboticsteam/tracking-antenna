@@ -13,15 +13,16 @@ MAX_MSG_SIZE = 1024  # max 1024 bytes
 @brief sends a message over UART
 @param message the message to send
 """
-def send_to_uart(msg: bytes) -> None:
+def send_to_uart(msg: bytes, ser) -> None:
     print(f"Sending {msg} over UART")
+    ser.write(msg)
 
 """
 @brief processes a message received
 @param message the message we received
 @return what we should send back in response to this message
 """
-def process_message(msg: bytes, ser: serial.Serial) -> bytes:
+def process_message(msg: bytes, ser) -> bytes:
     if msg == b'OFF':
         send_to_uart((0).to_bytes(1, signed=False), ser)
     elif msg == b'LEFT':
@@ -58,8 +59,9 @@ try:
                             if data:
                                 conn.sendall(data)
         except KeyboardInterrupt as e:
-            sock.close()
             print("Shutting down server")
+            sock.close()
+            ser.close()
 except Exception as e:
     pass
 
