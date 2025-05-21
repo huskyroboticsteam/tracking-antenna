@@ -37,9 +37,10 @@ def process_message(msg: bytes, ser) -> bytes:
         print(f"Unrecognized message: {msg}")
     return None
 
+ser = serial.Serial(UART_PATH)
+
 try:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        ser = serial.Serial(UART_PATH)
         sock.bind((HOST, PORT))
         sock.listen()
         try:
@@ -63,6 +64,7 @@ try:
             sock.close()
             ser.close()
 except Exception as e:
-    pass
+    print(e)
 
-# make sure to turn off the motors here
+# turn off motors
+ser.write(b'\00')
