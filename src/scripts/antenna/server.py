@@ -22,15 +22,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     sock.listen()
     try:
         while True:
-            conn, addr = sock.accept()
-            with conn:  # connection created
-                while True:
-                    data = conn.recv(MAX_MSG_SIZE)
-                    if not data:
-                        print("Client disconnected")
-                        break
-                    response = process_message(data)
-                    if data:
-                        conn.sendall(data)
+                conn, addr = sock.accept()
+                with conn:  # connection created
+                    while True:
+                        data = conn.recv(MAX_MSG_SIZE)
+                        if not data:
+                            print("Client disconnected")
+                            break
+                        response = process_message(data)
+                        if data:
+                            conn.sendall(data)
     except KeyboardInterrupt as e:
-        print("Shutting down server...")
+        sock.close()
+        print("Shutting down server")
