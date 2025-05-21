@@ -8,21 +8,33 @@ PORT = 2000  # we are using port 2000 to communicate
 MAX_MSG_SIZE = 1024  # max 1024 bytes
 
 """
-@brief forwards a message to the UART connection
-@param message the message to be forwarded
+@brief sends a message over UART
+@param message the message to send
 """
-def forward_to_uart(message):
-    pass
+def send_to_uart(msg: bytes) -> None:
+    print(f"Sending {msg} over UART")
 
 """
 @brief processes a message received
 @param message the message we received
 @return what we should send back in response to this message
 """
-def process_message(message: bytes) -> bytes:
-    print(f"Received {message}")
-    forward_to_uart(message)
+def process_message(msg: bytes) -> bytes:
+    if msg == b'OFF':
+        send_to_uart((0).to_bytes(1, signed=False))
+    elif msg == b'LEFT':
+        send_to_uart((1).to_bytes(1, signed=False))
+    elif msg == b'RIGHT':
+        send_to_uart((2).to_bytes(1, signed=False))
+    elif msg == b'UP':
+        send_to_uart((3).to_bytes(1, signed=False))
+    elif msg == b'DOWN':
+        send_to_uart((4).to_bytes(1, signed=False))
+    else:
+        print(f"Unrecognized message: {msg}")
     return None
+
+
 try:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind((HOST, PORT))
