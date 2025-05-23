@@ -10,6 +10,27 @@ HOST = "0.0.0.0"
 PORT = 2000  # we are using port 2000 to communicate
 MAX_MSG_SIZE = 1024  # max 1024 bytes
 
+motors_status = {
+    'pitch': 0,
+    'spin': 0,
+}
+
+"""
+@brief updates the motor speeds via UART
+@param ser the UART connection to send commands to
+"""
+def update_motors(ser: Serial) -> None:
+    if motors_status['pitch'] == 1:
+        send_to_uart(b'a', ser)
+    elif motors_status['pitch'] == -1:
+        send_to_uart(b'd', ser)
+
+    if motors_status['spin'] == 1:
+        send_to_uart(b'w', ser)
+    elif motors_status['spin'] == -1:
+        send_to_uart(b's', ser)
+
+
 """
 @brief sends a message over UART
 @param message the message to send
@@ -25,15 +46,16 @@ def send_to_uart(msg: bytes, ser: Serial) -> None:
 """
 def process_message(msg: bytes, ser: Serial) -> bytes:
     if msg == b'OFF':
-        send_to_uart((0).to_bytes(1, signed=False), ser)
+        motors_status['pitch'] = 0
+        motors_status['spin'] = 0
     elif msg == b'LEFT':
-        send_to_uart((1).to_bytes(1, signed=False), ser)
+        motors_status['spin'] = 1
     elif msg == b'RIGHT':
-        send_to_uart((2).to_bytes(1, signed=False), ser)
+        motors_status['spin'] = -1
     elif msg == b'UP':
-        send_to_uart((3).to_bytes(1, signed=False), ser)
+        motors_status['pitch'] = 1
     elif msg == b'DOWN':
-        send_to_uart((4).to_bytes(1, signed=False), ser)
+        motors_status['pitch'] = -1
     else:
         print(f"Unrecognized message: {msg}")
     return None
