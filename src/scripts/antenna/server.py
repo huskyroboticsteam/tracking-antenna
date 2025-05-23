@@ -24,17 +24,18 @@ motors_status = {
 @param ser the UART connection to send commands to
 """
 def update_motors(ser: Serial) -> None:
-    with status_lock:
-        if motors_status['pitch'] == 1:
-            send_to_uart(b'a', ser)
-        elif motors_status['pitch'] == -1:
-            send_to_uart(b'd', ser)
+    while True:
+        with status_lock:
+            if motors_status['pitch'] == 1:
+                send_to_uart(b'a', ser)
+            elif motors_status['pitch'] == -1:
+                send_to_uart(b'd', ser)
 
-        if motors_status['spin'] == 1:
-            send_to_uart(b'w', ser)
-        elif motors_status['spin'] == -1:
-            send_to_uart(b's', ser)
-    time.sleep(.025)
+            if motors_status['spin'] == 1:
+                send_to_uart(b'w', ser)
+            elif motors_status['spin'] == -1:
+                send_to_uart(b's', ser)
+        time.sleep(.025)
 
 """
 @brief sends a message over UART
@@ -50,7 +51,7 @@ def send_to_uart(msg: bytes, ser: Serial) -> None:
 @param message the message we received
 @return what we should send back in response to this message
 """
-def process_message(msg: bytes, ser: Serial) -> bytes:
+def process_message(msg: bytes) -> bytes:
     with status_lock:
         if msg == b'OFF':
             motors_status['pitch'] = 0
@@ -89,7 +90,7 @@ try:
                             if not data:
                                 print("Client disconnected")
                                 break
-                            response = process_message(data, ser)
+                            response = process_message(data)
                             if data:
                                 conn.sendall(data)
         except KeyboardInterrupt as e:
