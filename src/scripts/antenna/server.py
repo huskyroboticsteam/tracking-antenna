@@ -23,8 +23,8 @@ motors_status = {
 @brief updates the motor speeds via UART
 @param ser the UART connection to send commands to
 """
-def update_motors(ser: Serial) -> None:
-    while enable_motor_thread:
+def update_motors(ser: Serial, enabled: bool) -> None:
+    while enabled:
         with status_lock:
             if motors_status['spin'] == 1:
                 send_to_uart(b'a', ser)
