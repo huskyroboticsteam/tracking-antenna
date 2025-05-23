@@ -24,17 +24,18 @@ motors_status = {
 @param ser the UART connection to send commands to
 """
 def update_motors(ser: Serial) -> None:
-    while True:
+    while enable_motor_thread:
         with status_lock:
-            if motors_status['pitch'] == 1:
+            if motors_status['spin'] == 1:
                 send_to_uart(b'a', ser)
-            elif motors_status['pitch'] == -1:
+            elif motors_status['spin'] == -1:
                 send_to_uart(b'd', ser)
 
-            if motors_status['spin'] == 1:
+            if motors_status['pitch'] == 1:
                 send_to_uart(b'w', ser)
-            elif motors_status['spin'] == -1:
+            elif motors_status['pitch'] == -1:
                 send_to_uart(b's', ser)
+
         time.sleep(.025)
 
 """
@@ -70,7 +71,8 @@ def process_message(msg: bytes) -> bytes:
 
 ser = Serial(SERIAL_PATH, BAUD_RATE)
 
-motor_thread = Thread(target = update_motors, args=(ser,))
+enable_motor_thread = True
+motor_thread = Thread(target = update_motors, args=(ser, enable_motor_thread))
 motor_thread.start()
 
 try:
@@ -96,9 +98,14 @@ try:
         except KeyboardInterrupt as e:
             print("Shutting down server")
             sock.close()
+            enable_motor_thread = False
             motor_thread.join()
 except Exception as e:
     print(e)
+
+if enable_motor_thread:
+    enable_motor_thread = False
+    motor_thread.join()
 
 if ser.is_open:
     ser.close()
