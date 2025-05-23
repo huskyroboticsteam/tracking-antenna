@@ -4,7 +4,7 @@ from serial import Serial
 import socket
 
 SERIAL_PATH = "/dev/serial0"
-BAUD_RATE = 9600
+BAUD_RATE = 9600  # 115200
 
 HOST = "0.0.0.0"
 PORT = 2000  # we are using port 2000 to communicate
