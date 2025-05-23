@@ -23,8 +23,9 @@ motors_status = {
 @brief updates the motor speeds via UART
 @param ser the UART connection to send commands to
 """
-def update_motors(ser: Serial, enabled: bool) -> None:
-    while enabled:
+def update_motors(ser: Serial) -> None:
+    global enable_motor_thread
+    while enable_motor_thread:
         with status_lock:
             if motors_status['spin'] == 1:
                 send_to_uart(b'a', ser)
@@ -72,7 +73,7 @@ def process_message(msg: bytes) -> bytes:
 ser = Serial(SERIAL_PATH, BAUD_RATE)
 
 enable_motor_thread = True
-motor_thread = Thread(target = update_motors, args=(ser, enable_motor_thread))
+motor_thread = Thread(target = update_motors, args=(ser,))
 motor_thread.start()
 
 try:
