@@ -15,7 +15,7 @@ paused_mutex = Lock()
 toggle_mutex = Lock()
 motors_mutex = Lock()
 
-def update_motors(motors: list[PhonyMotor]):  # only used for debug
+def update_motors(motors):  # only used for debug
     while not done:
         with motors_mutex:
             for motor in motors:
